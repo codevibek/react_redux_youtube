@@ -1,32 +1,32 @@
 "use client";
 import { useParams } from "next/navigation";
 import React, { useEffect } from "react";
+import { useGetCommentsQuery } from "../store/apis/comments/api";
 
 export interface Comment {
   id: number;
   text: string;
+  postId: number;
 }
 
 const Comments = () => {
   const { id } = useParams();
-  const [comments, setComments] = React.useState([]);
+  const { data: comments } = useGetCommentsQuery(Number(id));
+
+  const [commentsData, setCommentsData] = React.useState<Comment[]>([]);
 
   useEffect(() => {
-    const getComments = async () => {
-      const response = await fetch(
-        `http://localhost:3000/comments?posts=${id}`
-      );
-      const data = await response.json();
-      setComments(data);
-    };
-    getComments();
-  });
+    if (comments) {
+      setCommentsData(comments);
+    }
+  }, [comments]);
   return (
     <div>
-      {comments.map((comment: Comment) => (
+      {commentsData?.map((comment: Comment) => (
         <div key={comment.id}>
           <h3>{comment.id}</h3>
-          <h3>{comment.text}</h3><br/>
+          <h3>{comment.text}</h3>
+          <br />
         </div>
       ))}
     </div>
